@@ -1474,7 +1474,23 @@ function initEventListeners() {
 
   // Recalculate settlements
   $("#refresh-settlements-btn").addEventListener("click", renderSuggestedSettlements);
+  // Floating "Add Expense" button (mobile)
+  const fab = $("#fab-add-expense");
+  if (fab) {
+    fab.addEventListener("click", () => {
+      // Switch to Expenses section
+      const navBtn = document.querySelector('.nav-link[data-section="expenses-section"]');
+      if (navBtn) navBtn.click();
+
+      // Scroll to the expense form
+      const section = document.getElementById("expenses-section");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
 }
+
 
 /* ====== Startup ====== */
 
