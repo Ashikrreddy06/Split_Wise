@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Splitwise Clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-circle">S</div>
+        <div class="logo-text">
+          <div class="logo-title">SplitIt</div>
+          <div class="logo-subtitle">Personal Splitwise</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-link active" data-section="dashboard-section">Dashboard</button>
+        <button class="nav-link" data-section="people-section">People</button>
+        <button class="nav-link" data-section="groups-section">Groups</button>
+        <button class="nav-link" data-section="expenses-section">Expenses</button>
+        <button class="nav-link" data-section="settings-section">Settings</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="export-btn" class="secondary-btn small-btn">Backup / Export</button>
+        <label for="import-file" class="secondary-btn small-btn file-label">
+          Import Data
+          <input type="file" id="import-file" accept="application/json" hidden />
+        </label>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <section id="dashboard-section" class="section active">
+        <header class="section-header">
+          <h1>Dashboard</h1>
+          <p>Overview of balances and suggested settlements.</p>
+        </header>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>Overall Balances</h2>
+            <div class="overall-balance">
+              <div>
+                <div class="label">You Should Receive</div>
+                <div id="you-are-owed" class="amount positive">₹0.00</div>
+              </div>
+              <div>
+                <div class="label">You Owe</div>
+                <div id="you-owe" class="amount negative">₹0.00</div>
+              </div>
+            </div>
+            <p class="hint">Tip: “You” is whoever you mark as yourself in People.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-header-inline">
+              <h2>Suggested Settlements</h2>
+              <button id="refresh-settlements-btn" class="secondary-btn small-btn">Recalculate</button>
+            </div>
+            <div id="settlements-list" class="settlements-list empty-state">
+              No settlements yet. Add some expenses first.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Per Person Balances</h2>
+          <div id="person-balances" class="person-balances empty-state">
+            Add people and expenses to see balances.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- PEOPLE -->
+      <section id="people-section" class="section">
+        <header class="section-header">
+          <h1>People</h1>
+          <p>Manage your friends and participants.</p>
+        </header>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2 id="people-form-title">Add Person</h2>
+            <form id="person-form" class="form">
+              <input type="hidden" id="person-id" />
+              <div class="form-field">
+                <label for="person-name">Name *</label>
+                <input id="person-name" required />
+                <div class="field-error" id="person-name-error" aria-live="polite"></div>
+              </div>
+
+              <div class="form-field">
+                <label for="person-contact">Email / Phone (optional)</label>
+                <input id="person-contact" />
+              </div>
+
+              <div class="form-field">
+                <label for="person-notes">Notes</label>
+                <textarea id="person-notes" rows="2"></textarea>
+              </div>
+
+              <div class="form-field checkbox-row">
+                <input type="checkbox" id="person-is-you" />
+                <label for="person-is-you">This is me</label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="primary-btn">Save Person</button>
+                <button type="button" id="person-cancel-btn" class="secondary-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h2>People List</h2>
+            <div id="people-list" class="list empty-state">
+              No people added yet. Use the form to add someone.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GROUPS -->
+      <section id="groups-section" class="section">
+        <header class="section-header">
+          <h1>Groups</h1>
+          <p>Organize expenses by trips, flatmates, etc.</p>
+        </header>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2 id="groups-form-title">Add Group</h2>
+            <form id="group-form" class="form">
+              <input type="hidden" id="group-id" />
+              <div class="form-field">
+                <label for="group-name">Group Name *</label>
+                <input id="group-name" />
+                <div class="field-error" id="group-name-error" aria-live="polite"></div>
+              </div>
+
+              <div class="form-field">
+                <label for="group-description">Description</label>
+                <textarea id="group-description" rows="2"></textarea>
+              </div>
+
+              <div class="form-field">
+                <label>Members</label>
+                <div id="group-members" class="chips-container">
+                  <!-- checkboxes for people -->
+                </div>
+                <div class="field-error" id="group-members-error" aria-live="polite"></div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="primary-btn">Save Group</button>
+                <button type="button" id="group-cancel-btn" class="secondary-btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h2>Groups List</h2>
+            <div id="groups-list" class="list empty-state">
+              No groups yet. Create one on the left.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Group Balances</h2>
+          <div id="group-balances" class="list empty-state">
+            Create groups and add expenses to see group balances.
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPENSES -->
+      <section id="expenses-section" class="section">
+        <header class="section-header">
+          <h1>Expenses</h1>
+          <p>Add and manage your expenses.</p>
+        </header>
+
+        <div class="card">
+          <h2 id="expense-form-title">Add Expense</h2>
+          <form id="expense-form" class="form">
+            <input type="hidden" id="expense-id" />
+
+            <div class="grid-3">
+              <div class="form-field">
+                <label for="expense-description">Description *</label>
+                <input id="expense-description" />
+              </div>
+
+              <div class="form-field">
+                <label for="expense-amount">Amount *</label>
+                <input id="expense-amount" type="number" min="0" step="0.01" />
+              </div>
+
+              <div class="form-field">
+                <label for="expense-date">Date *</label>
+                <input id="expense-date" type="date" />
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="form-field">
+                <label for="expense-payer">Payer *</label>
+                <select id="expense-payer"></select>
+              </div>
+
+              <div class="form-field">
+                <label for="expense-group">Group</label>
+                <select id="expense-group">
+                  <option value="">No group</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="expense-category">Category</label>
+                <select id="expense-category">
+                  <option value="Food">Food</option>
+                  <option value="Travel">Travel</option>
+                  <option value="Rent">Rent</option>
+                  <option value="Utilities">Utilities</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="expense-notes">Notes</label>
+              <textarea id="expense-notes" rows="2"></textarea>
+            </div>
+
+            <div class="card soft-card">
+              <h3>Participants & Split</h3>
+              <div class="form-field">
+                <label>Participants *</label>
+                <div id="expense-participants" class="chips-container">
+                  <!-- participant checkboxes -->
+                </div>
+                <div class="field-error" id="expense-participants-error" aria-live="polite"></div>
+              </div>
+
+              <div class="form-field">
+                <label>Split Type</label>
+                <div class="chip-row">
+                  <label class="chip">
+                    <input type="radio" name="split-type" value="equal" checked />
+                    <span>Equally</span>
+                  </label>
+                  <label class="chip">
+                    <input type="radio" name="split-type" value="exact" />
+                    <span>By Amount</span>
+                  </label>
+                  <label class="chip">
+                    <input type="radio" name="split-type" value="percent" />
+                    <span>By %</span>
+                  </label>
+                  <label class="chip">
+                    <input type="radio" name="split-type" value="shares" />
+                    <span>By Shares</span>
+                  </label>
+                </div>
+              </div>
+
+              <div id="split-inputs" class="split-inputs">
+                <!-- per-person split inputs rendered by JS -->
+              </div>
+
+              <div class="field-error" id="expense-split-error" aria-live="polite"></div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="primary-btn">Save Expense</button>
+              <button type="button" id="expense-cancel-btn" class="secondary-btn">Cancel</button>
+            </div>
+
+            <div id="expense-form-error" class="form-error" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header-inline">
+            <h2>Expenses List</h2>
+          </div>
+
+          <!-- Filters -->
+          <div class="filters">
+            <div class="filters-row">
+              <div class="form-field">
+                <label for="filter-group">Group</label>
+                <select id="filter-group">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="filter-person">Person</label>
+                <select id="filter-person">
+                  <option value="">All</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="filter-category">Category</label>
+                <select id="filter-category">
+                  <option value="">All</option>
+                  <option value="Food">Food</option>
+                  <option value="Travel">Travel</option>
+                  <option value="Rent">Rent</option>
+                  <option value="Utilities">Utilities</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Other">Other</option>
+                  <option value="Settlement">Settlement</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="filter-search">Search</label>
+                <input id="filter-search" placeholder="Search description" />
+              </div>
+            </div>
+
+            <div class="filters-row">
+              <div class="form-field">
+                <label for="filter-date-from">From</label>
+                <input id="filter-date-from" type="date" />
+              </div>
+              <div class="form-field">
+                <label for="filter-date-to">To</label>
+                <input id="filter-date-to" type="date" />
+              </div>
+              <div class="form-field">
+                <label for="sort-by">Sort By</label>
+                <select id="sort-by">
+                  <option value="date-desc">Date (newest)</option>
+                  <option value="date-asc">Date (oldest)</option>
+                  <option value="amount-desc">Amount (high → low)</option>
+                  <option value="amount-asc">Amount (low → high)</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>&nbsp;</label>
+                <button id="clear-filters-btn" class="secondary-btn small-btn">Clear Filters</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="expenses-list" class="list empty-state">
+            No expenses yet. Add your first one above.
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings-section" class="section">
+        <header class="section-header">
+          <h1>Settings</h1>
+          <p>Customize your app.</p>
+        </header>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>Appearance</h2>
+            <div class="form-field">
+              <label for="theme-toggle">Theme</label>
+              <button id="theme-toggle" class="secondary-btn">Toggle Dark / Light</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Currency</h2>
+            <form id="settings-form" class="form">
+              <div class="form-field">
+                <label for="currency-symbol">Currency Symbol</label>
+                <input id="currency-symbol" maxlength="3" />
+                <p class="hint">Example: ₹, $, €, AED</p>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="primary-btn">Save Settings</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Simple confirmation modal for deletes -->
+  <div id="confirm-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <h2 id="confirm-title">Are you sure?</h2>
+      <p id="confirm-message">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="secondary-btn">Cancel</button>
+        <button id="confirm-ok" class="danger-btn">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast for small messages -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
