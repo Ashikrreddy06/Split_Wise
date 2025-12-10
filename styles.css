@@ -16,6 +16,32 @@
   --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
+/* ====== Floating Action Button (mobile) ====== */
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: 80px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #4f46e5, #22c55e);
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 600;
+  display: none; /* shown only on small screens */
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+  z-index: 25;
+}
+
+.fab:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+
 body.dark {
   --bg: #020617;
   --bg-elevated: #020617;
@@ -654,20 +680,14 @@ body.dark .split-item {
     align-items: flex-start;
   }
 
+  /* Table-style layout still ok on tablets here */
+
   .expense-row {
-    grid-template-columns: 1.6fr 0.9fr;
-    grid-template-rows: auto auto auto;
-    row-gap: 4px;
+    grid-template-columns: minmax(0, 1.6fr) 0.8fr 0.9fr 0.9fr 0.9fr 0.9fr 1fr;
   }
 
-  .expense-row > :nth-child(4),
-  .expense-row > :nth-child(5),
-  .expense-row > :nth-child(6) {
-    display: none;
-  }
-
-  .expense-actions {
-    justify-content: flex-start;
+  .fab {
+    display: flex; /* show FAB on tablets & phones */
   }
 }
 
@@ -701,7 +721,62 @@ body.dark .split-item {
   .toast.show {
     transform: translate(-50%, 0);
   }
+
+  /* === Expense list as condensed "cards" === */
+
+  /* Hide header row on very small screens */
+  .expense-row-header {
+    display: none;
+  }
+
+  /* Each expense becomes a stacked card */
+  .expense-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 10px 10px;
+  }
+
+  /* Description + meta at the top (already grouped in first child) */
+  .expense-row > div:nth-child(1) {
+    order: 1;
+  }
+
+  /* Amount – prominent line under title */
+  .expense-row > div:nth-child(2) {
+    order: 2;
+    font-weight: 600;
+  }
+
+  /* Payer line */
+  .expense-row > div:nth-child(3) {
+    order: 3;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Date / Group / Category lines – show them again on tiny screens */
+  .expense-row > div:nth-child(4),
+  .expense-row > div:nth-child(5),
+  .expense-row > div:nth-child(6) {
+    display: block;
+    order: 4;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Actions at the bottom */
+  .expense-row > div:nth-child(7) {
+    order: 5;
+    margin-top: 4px;
+  }
+
+  .expense-actions {
+    justify-content: flex-start;
+  }
 }
+
 
 /* ====== Animations ====== */
 @keyframes fadeIn {
