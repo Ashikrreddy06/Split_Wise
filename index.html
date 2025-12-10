@@ -2,17 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Simple Splitwise Clone</title>
+  <title>SplitIt - Personal Splitwise</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA manifest & colors -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4f46e5" />
+
+  <!-- (Optional) iOS meta tags for better "Add to Home Screen" -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SplitIt">
+
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Basic icon (you can change these paths or files) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app" class="app">
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar / Top Navigation -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="logo-circle">S</div>
@@ -22,7 +37,7 @@
         </div>
       </div>
 
-      <nav class="nav">
+      <nav class="nav" aria-label="Main navigation">
         <button class="nav-link active" data-section="dashboard-section">Dashboard</button>
         <button class="nav-link" data-section="people-section">People</button>
         <button class="nav-link" data-section="groups-section">Groups</button>
@@ -43,7 +58,7 @@
     <main class="main">
 
       <!-- DASHBOARD -->
-      <section id="dashboard-section" class="section active">
+      <section id="dashboard-section" class="section active" aria-label="Dashboard">
         <header class="section-header">
           <h1>Dashboard</h1>
           <p>Overview of balances and suggested settlements.</p>
@@ -86,7 +101,7 @@
       </section>
 
       <!-- PEOPLE -->
-      <section id="people-section" class="section">
+      <section id="people-section" class="section" aria-label="People">
         <header class="section-header">
           <h1>People</h1>
           <p>Manage your friends and participants.</p>
@@ -135,7 +150,7 @@
       </section>
 
       <!-- GROUPS -->
-      <section id="groups-section" class="section">
+      <section id="groups-section" class="section" aria-label="Groups">
         <header class="section-header">
           <h1>Groups</h1>
           <p>Organize expenses by trips, flatmates, etc.</p>
@@ -189,7 +204,7 @@
       </section>
 
       <!-- EXPENSES -->
-      <section id="expenses-section" class="section">
+      <section id="expenses-section" class="section" aria-label="Expenses">
         <header class="section-header">
           <h1>Expenses</h1>
           <p>Add and manage your expenses.</p>
@@ -367,7 +382,7 @@
       </section>
 
       <!-- SETTINGS -->
-      <section id="settings-section" class="section">
+      <section id="settings-section" class="section" aria-label="Settings">
         <header class="section-header">
           <h1>Settings</h1>
           <p>Customize your app.</p>
