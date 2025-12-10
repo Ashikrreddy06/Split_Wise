@@ -138,7 +138,7 @@ function calculateNetBalances() {
   App.state.people.forEach((p) => (balances[p.id] = 0));
 
   for (const exp of App.state.expenses) {
-    const { payerId, participantSplits, amount, type } = exp;
+    const { payerId, participantSplits, type } = exp;
     if (!payerId || !participantSplits || !participantSplits.length) continue;
 
     if (type === "settlement") {
@@ -430,9 +430,6 @@ function resetPersonForm() {
 }
 
 function deletePerson(id) {
-  // Basic prevention: if they appear in expenses/groups, deleting them is allowed
-  // but might make older entries refer to unknown person; we'll keep the id
-  // around in expenses and just show "(Deleted)" later if needed.
   App.state.people = App.state.people.filter((p) => p.id !== id);
   App.state.groups.forEach((g) => {
     g.memberIds = g.memberIds.filter((mid) => mid !== id);
@@ -1226,7 +1223,7 @@ function loadExpenseIntoForm(id) {
       );
     });
 
-  // split type: we cannot perfectly infer, default to equal
+  // split type: cannot perfectly infer, default to equal
   document.querySelector('input[name="split-type"][value="equal"]').checked =
     true;
   renderSplitInputs();
@@ -1243,11 +1240,6 @@ function deleteExpense(id) {
 
 /* ====== Settle Up ====== */
 
-/**
- * When user clicks "Settle Up" on a suggested settlement:
- *  - We create a special "settlement" expense that represents a direct transfer
- *    from one person to another.
- */
 function handleSettleUpClick(fromId, toId, amount) {
   const from = App.state.people.find((p) => p.id === fromId);
   const to = App.state.people.find((p) => p.id === toId);
@@ -1499,4 +1491,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   renderAll();
+
+  // PWA: register service worker (for install + offline)
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register("sw.js")
+      .catch((err) => console.error("SW registration failed", err));
+  }
 });
+
+{
+  "name": "SplitIt - Personal Splitwise",
+  "short_name": "SplitIt",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
