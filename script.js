@@ -1472,6 +1472,21 @@ function initEventListeners() {
     }
   });
 
+  // Mobile backup buttons
+const exportMobile = $("#export-btn-mobile");
+if (exportMobile) {
+  exportMobile.addEventListener("click", exportData);
+}
+
+const importMobile = $("#import-btn-mobile");
+if (importMobile) {
+  importMobile.addEventListener("click", () => {
+    $("#import-file").value = "";
+    $("#import-file").click();
+  });
+}
+
+
   // Recalculate settlements
   $("#refresh-settlements-btn").addEventListener("click", renderSuggestedSettlements);
   // Floating "Add Expense" button (mobile)
